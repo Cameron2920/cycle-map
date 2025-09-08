@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {useEffect, useState} from "react";
+import Image from "next/image";
 
 export default function Home() {
   const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
@@ -25,11 +26,18 @@ export default function Home() {
         <p className="text-lg sm:text-xl text-gray-700 mb-8">
           Visualize all your cycling activities from Strava on a full-screen interactive map. Track your rides, see your routes, and get a clear overview of your cycling history.
         </p>
-        <Link href={authUrl}
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition"
-        >
-          Connect with Strava
-        </Link>
+
+        {/*Mandatory Strava Button*/}
+        <div className="mb-8 flex justify-center">
+          <a
+            href={authUrl} >
+            <Image
+              src="/btn_strava_connect_with_orange_x2.png"
+              alt="Connect with Strava"
+              width={192} height={48}
+            />
+          </a>
+        </div>
       </div>
 
       {/* Features Section */}
@@ -46,6 +54,17 @@ export default function Home() {
           <h2 className="font-semibold text-xl mb-2">Quick Access</h2>
           <p className="text-gray-600">Login with Strava and instantly access your cycling history.</p>
         </div>
+      </div>
+
+      {/* Mandatory Strava Disclaimer */}
+      <div className="text-sm text-gray-600 mt-4">
+        <Image
+          src="/api_logo_pwrdBy_strava_horiz_orange.png"
+          alt="Powered by Strava"
+          width={120}
+          height={24}
+          className="inline-block ml-2"
+        />
       </div>
     </div>
   );

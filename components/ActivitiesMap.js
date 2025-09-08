@@ -145,6 +145,15 @@ export default function ActivitiesMap() {
               <p className="text-sm text-gray-600">
                 Moving Time: {formatMovingTime(ride.moving_time)}
               </p>
+              <p className="text-sm text-gray-600">
+                <a
+                  href={`https://www.strava.com/activities/${ride.id}`}
+                  className="text-[#FC5200] underline"
+                  target="_blank" rel="noopener noreferrer"
+                >
+                  View on Strava
+                </a>
+              </p>
             </li>
           ))}
         </ul>
