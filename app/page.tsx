@@ -2,7 +2,11 @@ import Link from "next/link";
 
 export default function Home() {
   const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
-  const redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI;
+  let redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI;
+
+  if(!redirectUri) {
+    redirectUri = `${window.location.protocol}:${window.location.host}/api/auth/strava/callback`;
+  }
 
   const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=read,activity:read`;
 
