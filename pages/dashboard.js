@@ -17,11 +17,6 @@ export async function getServerSideProps({ req, res }) {
 }
 
 export default function Dashboard({ user }) {
-  async function handleLogout() {
-    await fetch("/api/logout");
-    window.location.href = "/";
-  }
-
   return (
     <div className="relative w-screen h-screen">
       <ActivitiesMap />
