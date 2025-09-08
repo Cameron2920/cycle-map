@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import polyline from "@mapbox/polyline";
+import Image from "next/image";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -159,5 +160,14 @@ export default function ActivitiesMap() {
         </ul>
       </div>
     )}
+
+    <div className="absolute bottom-4 left-4 z-10">
+      <Image
+        src="/api_logo_pwrdBy_strava_horiz_orange.png"
+        alt="Powered by Strava"
+        width={120}
+        height={24}
+      />
+    </div>
   </div>;
 }
