@@ -1,0 +1,3 @@
+-Handle profiles with more activities than page size
+-Display activity stats on click?
+-landing page
