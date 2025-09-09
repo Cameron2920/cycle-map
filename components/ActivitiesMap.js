@@ -8,9 +8,19 @@ import Image from "next/image";
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 export default function ActivitiesMap() {
+  const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [selectedRides, setSelectedRides] = useState([]);
+  const [selectedRide, setSelectedRide] = useState(null);
   const [rides, setRides] = useState([]);
+  const defaultRouteColour = "#2438b5";
+  const selectedRoutesColour = "#e91e63";
+  const selectedRouteColour = "#ff7f0e";
+  const selectedLineWidth = 5;
+  const defaultLineWidth = 5;
+  const defaultRouteOpacity = 0.5;
+  const selectedRoutesOpacity = 0.75;
+  const selectedRouteOpacity = 0.9;
 
   useEffect(() => {
     async function fetchRides() {
@@ -46,7 +56,11 @@ export default function ActivitiesMap() {
       type: "line",
       source: `ride-${ride.id}`,
       layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": "#e91e63", "line-width": 3 },
+      paint: {
+        "line-color": defaultRouteColour,
+        "line-width": defaultLineWidth,
+        "line-opacity": defaultRouteOpacity
+      },
     });
     coords.forEach(([lng, lat]) => bounds.extend([lng, lat]));
 
@@ -59,15 +73,96 @@ export default function ActivitiesMap() {
     });
   }
 
+  function styleRide(map, ride) {
+    const layerId = `ride-${ride.id}`;
+
+    if (!map.getLayer(layerId)) return;
+
+    if (selectedRide === ride) {
+      map.setPaintProperty(layerId, "line-color", selectedRouteColour);
+      map.setPaintProperty(layerId, "line-width", selectedLineWidth);
+      map.setPaintProperty(layerId, "line-opacity", selectedRouteOpacity);
+    }
+    else if (selectedRides && selectedRides.includes(ride)) {
+      map.setPaintProperty(layerId, "line-color", selectedRoutesColour);
+      map.setPaintProperty(layerId, "line-width", selectedLineWidth);
+      map.setPaintProperty(layerId, "line-opacity", selectedRoutesOpacity);
+    }
+    else {
+      map.setPaintProperty(layerId, "line-color", defaultRouteColour);
+      map.setPaintProperty(layerId, "line-width", defaultLineWidth);
+      map.setPaintProperty(layerId, "line-opacity", defaultRouteOpacity);
+    }
+  }
+
+  function moveRideLayerUp(map, ride) {
+    const layerId = `ride-${ride.id}`;
+    map.moveLayer(layerId);
+  }
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    rides.forEach((ride) => {
+      styleRide(mapRef.current, ride)
+    })
+    selectedRides.forEach((ride) => {
+      moveRideLayerUp(mapRef.current, ride)
+    })
+
+    if(selectedRide){
+      moveRideLayerUp(mapRef.current, selectedRide)
+    }
+  }, [selectedRide, selectedRides]);
+
+  function handleMapClickEvent(event){
+    if (!mapRef.current) return;
+
+    let map = mapRef.current;
+    const features = map.queryRenderedFeatures(event.point, {
+      layers: rides.map((ride) => `ride-${ride.id}`),
+    });
+
+    if (!features.length) return;
+
+    // Collect clicked ride(s)
+    const selectedRideIds = features.map((feature) => {
+      let split = feature.source.split("-");
+
+      if(split.length == 2) {
+        return split[1];
+      }
+      return null;
+    });
+    let newSelectedRides = rides.filter(ride => selectedRideIds.includes(ride.id.toString()));
+    setSelectedRides(newSelectedRides);
+
+    if(newSelectedRides.length == 1){
+      setSelectedRide(newSelectedRides[0]);
+    }
+    const bounds = new mapboxgl.LngLatBounds();
+
+    newSelectedRides.forEach((ride) => {
+      const coords = polyline
+        .decode(ride.map.summary_polyline)
+        .map(([lat, lng]) => [lng, lat]);
+      coords.forEach(([lng, lat]) => bounds.extend([lng, lat]));
+    });
+    map.fitBounds(bounds, { padding: 50 });
+  }
+
   useEffect(() => {
     if (!rides.length) return;
 
-    const map = new mapboxgl.Map({
+    if (mapRef.current) return;
+
+    mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: [43.6532, -79.3832],
       zoom: 10,
     });
+    let map = mapRef.current;
 
     // Add zoom and rotation controls
     map.addControl(new mapboxgl.NavigationControl());
@@ -79,28 +174,7 @@ export default function ActivitiesMap() {
       rides.forEach((ride) => {
         setupRide(map, ride, bounds);
       });
-      map.on("click", (e) => {
-        console.log("clicked");
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: rides.map((ride) => `ride-${ride.id}`),
-        });
-        console.log("clicked", features);
-
-        if (!features.length) return;
-
-        // Collect clicked ride(s)
-        const selectedRideIds = features.map((feature) => {
-          let split = feature.source.split("-");
-
-          if(split.length == 2) {
-            return split[1];
-          }
-          return null;
-        });
-        console.log("selectedRideIds ", selectedRideIds)
-        console.log("clicked rides ", rides.filter(ride => selectedRideIds.includes(ride.id)))
-        setSelectedRides(rides.filter(ride => selectedRideIds.includes(ride.id.toString())));
-      });
+      map.on("click", handleMapClickEvent);
       map.fitBounds(bounds, { padding: 50 });
     });
     return () => map.remove(); // cleanup on unmount
@@ -119,7 +193,7 @@ export default function ActivitiesMap() {
       <div className="absolute top-20 right-4 max-h-[90vh] w-80 bg-white rounded-xl border border-gray-300 shadow-xl p-6 z-10 flex flex-col">
         {/* Header with close button */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Selected Rides</h2>
+          <h2 className="text-lg font-semibold">{ selectedRides.length > 1 ? "Selected Rides" : "Selected Ride" }</h2>
           <button
             onClick={() => setSelectedRides([])}
             className="text-gray-500 hover:text-gray-700 transition"
@@ -134,7 +208,8 @@ export default function ActivitiesMap() {
           {selectedRides.map((ride) => (
             <li
               key={ride.id}
-              className="border rounded-lg p-3 hover:shadow-md transition"
+              onClick={() => setSelectedRide(ride)}
+              className={`border-2 border-[${selectedRide === ride ? selectedRouteColour : selectedRoutesColour}] rounded-lg p-3 hover:shadow-md transition`}
             >
               <h3 className="font-bold text-gray-800">{ride.name}</h3>
               <p className="text-sm text-gray-600">

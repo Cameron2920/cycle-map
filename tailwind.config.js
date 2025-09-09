@@ -8,5 +8,9 @@ module.exports = {
   theme: {
     extend: {},
   },
+  safelist: [
+    "border-[#ff7f0e]",
+    "border-[#e91e63]",
+  ],
   plugins: [],
 };
