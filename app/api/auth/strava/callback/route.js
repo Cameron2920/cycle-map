@@ -1,11 +1,14 @@
 import { getIronSession } from "iron-session";
 import { sessionOptions } from "@/lib/session";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-export default async function handler(req, res) {
-  const { code } = req.query;
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get("code");
 
   if (!code) {
-    return res.status(400).json({ error: "Missing code" });
+    return NextResponse.json({ error: "Missing code" }, { status: 400 });
   }
 
   try {
@@ -23,10 +26,11 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.errors) {
-      return res.status(400).json(data);
+      return NextResponse.json(data, { status: 400 });
     }
 
-    const session = await getIronSession(req, res, sessionOptions);
+    // Attach session to cookies
+    const session = await getIronSession(cookies(), sessionOptions);
 
     session.strava = {
       accessToken: data.access_token,
@@ -37,9 +41,10 @@ export default async function handler(req, res) {
 
     await session.save();
 
-    res.redirect("/dashboard");
+    // Redirect to dashboard
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to exchange token" });
+    return NextResponse.json({ error: "Failed to exchange token" }, { status: 500 });
   }
 }

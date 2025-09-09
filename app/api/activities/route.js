@@ -1,13 +1,14 @@
 import { getIronSession } from "iron-session";
 import { sessionOptions } from "@/lib/session";
+import { cookies } from "next/headers";
 
-export default async function handler(req, res) {
-  const session = await getIronSession(req, res, sessionOptions);
+export async function GET() {
+  // get session from cookies
+  const session = await getIronSession(cookies(), sessionOptions);
 
   if (!session.strava) {
-    return res.status(401).json({ error: "Not authenticated" });
+    return Response.json({ error: "Not logged in" }, { status: 401 });
   }
-
   const { accessToken } = session.strava;
 
   try {
@@ -22,9 +23,7 @@ export default async function handler(req, res) {
     );
 
     if (!response.ok) {
-      return res
-        .status(response.status)
-        .json({ error: "Failed to fetch activities" });
+      return Response.json({ error: "Failed to fetch activities" }, { status: response.status });
     }
 
     const activities = await response.json();
@@ -32,9 +31,10 @@ export default async function handler(req, res) {
     // Filter only cycling activities
     const rides = activities.filter((a) => a.type === "Ride");
 
-    res.status(200).json(rides);
-  } catch (err) {
+    return Response.json(rides);
+  }
+  catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error fetching activities" });
+    return Response.json({ error: "Server error fetching activities" }, { status: 500 });
   }
 }
