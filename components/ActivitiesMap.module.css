@@ -1,0 +1,70 @@
+/* RidePanel.module.css */
+
+/* Panel container */
+.panel {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    height: 15rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    z-index: 10;
+    border-color: #e91e63;
+    border-width: 2px;
+}
+
+/* Header */
+.panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #e91e63;
+}
+
+/* Rides list */
+.rideList {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.25rem; /* avoid scrollbar overlap */
+}
+
+/* Ride item */
+.rideItem {
+    border: 1px solid rgba(0,0,0,.5);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.rideItem:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.selected {
+    border-color: #ff7f0e;
+    border-width: 5px;
+}
+
+/* Desktop styles */
+@media (min-width: 640px) {
+    .panel {
+        top: 5rem;
+        bottom: auto;
+        left: calc(100vw - 11rem);
+        width: 20rem;
+        height: auto;
+        max-height: 90vh;
+    }
+}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import polyline from "@mapbox/polyline";
 import Image from "next/image";
+import styles from './ActivitiesMap.module.css';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -140,6 +141,9 @@ export default function ActivitiesMap() {
     if(newSelectedRides.length == 1){
       setSelectedRide(newSelectedRides[0]);
     }
+    else{
+      setSelectedRide(null);
+    }
     const bounds = new mapboxgl.LngLatBounds();
 
     newSelectedRides.forEach((ride) => {
@@ -190,42 +194,33 @@ export default function ActivitiesMap() {
 
     {/* Right-hand side panel */}
     {selectedRides.length > 0 && (
-      <div className="absolute top-20 right-4 max-h-[90vh] w-80 bg-white rounded-xl border border-gray-300 shadow-xl p-6 z-10 flex flex-col">
-        {/* Header with close button */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">{ selectedRides.length > 1 ? "Selected Rides" : "Selected Ride" }</h2>
+      <div className={styles.panel}>
+        <div className={styles.panelHeader}>
+          <h2>{selectedRides.length > 1 ? "Selected Rides" : "Selected Ride"}</h2>
           <button
             onClick={() => setSelectedRides([])}
-            className="text-gray-500 hover:text-gray-700 transition"
             aria-label="Clear Selection"
           >
             ✕
           </button>
         </div>
 
-        {/* Rides list */}
-        <ul className="space-y-4 overflow-y-auto">
+        <ul className={styles.rideList}>
           {selectedRides.map((ride) => (
             <li
               key={ride.id}
               onClick={() => setSelectedRide(ride)}
-              className={`border-2 border-[${selectedRide === ride ? selectedRouteColour : selectedRoutesColour}] rounded-lg p-3 hover:shadow-md transition`}
+              className={`${styles.rideItem} ${selectedRide === ride ? styles.selected : ''}`}
             >
-              <h3 className="font-bold text-gray-800">{ride.name}</h3>
-              <p className="text-sm text-gray-600">
-                {new Date(ride.start_date).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600">
-                Distance: {(ride.distance / 1000).toFixed(1)} km
-              </p>
-              <p className="text-sm text-gray-600">
-                Moving Time: {formatMovingTime(ride.moving_time)}
-              </p>
-              <p className="text-sm text-gray-600">
+              <h3>{ride.name}</h3>
+              <p>{new Date(ride.start_date).toLocaleDateString()}</p>
+              <p>Distance: {(ride.distance / 1000).toFixed(1)} km</p>
+              <p>Moving Time: {formatMovingTime(ride.moving_time)}</p>
+              <p>
                 <a
                   href={`https://www.strava.com/activities/${ride.id}`}
-                  className="text-[#FC5200] underline"
-                  target="_blank" rel="noopener noreferrer"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   View on Strava
                 </a>
