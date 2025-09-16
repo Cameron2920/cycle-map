@@ -5,10 +5,11 @@ import mapboxgl from "mapbox-gl";
 import polyline from "@mapbox/polyline";
 import Image from "next/image";
 import styles from './ActivitiesMap.module.css';
+import {demoRides} from "./DemoData";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-export default function ActivitiesMap() {
+export default function ActivitiesMap({isDemo}) {
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [selectedRides, setSelectedRides] = useState([]);
@@ -25,13 +26,17 @@ export default function ActivitiesMap() {
 
   useEffect(() => {
     async function fetchRides() {
-      const res = await fetch("/api/activities");
-      if (res.ok) {
-        const data = await res.json();
-        setRides(data);
-      }
-      else if(res.status === 401) {
-        window.location.href = "/";
+      if (isDemo) {
+        setRides(demoRides);
+      } else {
+        const res = await fetch("/api/activities");
+
+        if (res.ok) {
+          const data = await res.json();
+          setRides(data);
+        } else if (res.status === 401) {
+          window.location.href = "/";
+        }
       }
     }
     fetchRides();
@@ -216,15 +221,17 @@ export default function ActivitiesMap() {
               <p>{new Date(ride.start_date).toLocaleDateString()}</p>
               <p>Distance: {(ride.distance / 1000).toFixed(1)} km</p>
               <p>Moving Time: {formatMovingTime(ride.moving_time)}</p>
-              <p>
-                <a
-                  href={`https://www.strava.com/activities/${ride.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on Strava
-                </a>
-              </p>
+              {!isDemo &&
+                <p>
+                  <a
+                    href={`https://www.strava.com/activities/${ride.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on Strava
+                  </a>
+                </p>
+              }
             </li>
           ))}
         </ul>

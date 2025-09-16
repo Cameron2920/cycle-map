@@ -2,22 +2,34 @@
 
 import { useState, useEffect } from "react";
 
-export default function UserMenu() {
+export default function UserMenu({isDemo}) {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    async function fetchUser() {
-      const res = await fetch("/api/me"); // fetch Strava session info
+  async function fetchUser() {
+    if(isDemo) {
+      setUser({
+        firstname: "Demo",
+        profile: "https://dgalywyr863hv.cloudfront.net/pictures/strava_o_auth/applications/175875/40219028/2/medium.jpg"
+      })
+    }
+    else{
+      const res = await fetch("/api/me");
+
       if (res.ok) {
         const data = await res.json();
         setUser(data);
       }
     }
+  }
+
+  useEffect(() => {
     fetchUser();
   }, []);
 
   async function handleLogout() {
-    await fetch("/api/logout");
+    if(!isDemo) {
+      await fetch("/api/logout");
+    }
     window.location.href = "/"; // redirect home
   }
 

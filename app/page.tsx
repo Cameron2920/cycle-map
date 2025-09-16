@@ -27,6 +27,20 @@ export default function Home() {
           Visualize all your cycling activities from Strava on a full-screen interactive map. Track your rides, see your routes, and get a clear overview of your cycling history.
         </p>
 
+        <p className="text-lg sm:text-xl text-red-700 font-bold mb-8">
+          NOTE: This app is not yet approved by Strava, so other users cannot connect their Strava accounts. Please use the demo mode below instead.
+        </p>
+
+        {/* Demo Button */}
+        <div className="flex justify-center m-10">
+          <Link
+            href="/dashboard?mode=demo"
+            className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow hover:bg-gray-700 transition"
+          >
+            Try Demo Mode
+          </Link>
+        </div>
+
         {/*Mandatory Strava Button*/}
         <div className="mb-8 flex justify-center">
           <a
