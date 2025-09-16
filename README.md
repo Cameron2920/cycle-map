@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cycle Log 🚴‍♂️
 
-## Getting Started
+Cycle Log is a web app that visualizes your cycling activities from [Strava](https://www.strava.com) on an interactive map.  
+You can explore your ride history, view routes, and get a clear overview of where you’ve cycled.
 
-First, run the development server:
+👉 **[Try it out here](https://cycle-map.vercel.app/dashboard?mode=demo)** 👈 (NOTE: You will only be able to use the demo mode since this app has not yet been approved by Strava.)
+
+---
+
+## ✨ Features
+- 📍 **Interactive Maps** – All of your rides plotted on a full-screen, zoomable map.
+- 📊 **Ride Overview** – See distances, durations, and dates for your activities.
+- 🔑 **Strava Integration** – Connect with Strava to pull in your personal ride data.
+- 🧪 **Demo Mode** – Try out the app without a Strava account using sample rides.
+
+---
+
+## Development
+
+This is a Next.js app. 
+
+### Prerequisites
+- Node.js (>= 18 recommended)
+- A Strava developer account + API credentials (for live mode)
+- A mapbox account
+
+### Getting Started
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Setup environment variables
+
+```bash
+cp env.local.example .env.local
+```
+
+You will need to fill in the variable values in .env.local. 
+SESSION_SECRET should be a random string.
+
+Then run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+And then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This app is automatically deployed on Vercel whenever pushed to the main the branch.
